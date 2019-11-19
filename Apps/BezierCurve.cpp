@@ -25,12 +25,10 @@ public:
 		p1(p1), p2(p2), p3(p3), p4(p4), res(res) { }
 	vec3 Point(float t) {
 		// return a point on the Bezier curve given parameter t, in (0,1)
-		vec3 point =	(pow(-t, 3.0) + (3 * pow(t, 2.0)) - (3 * t) + 1) * p1 + // p1
-						((3 * pow(t, 3.0)) - (6 * pow(t, 2.0)) + (3 * t)) * p2 + // p2
-						((-3 * pow(t, 3.0)) + (3 * pow(t, 2.0))) * p3 + // p3
-						pow(t, 3.0) * p4; // p4
-		//return normalize(point);
-		return point;
+		return	(pow(-t, 3.0) + (3 * pow(t, 2.0)) - (3 * t) + 1) * p1 + // p1
+				((3 * pow(t, 3.0)) - (6 * pow(t, 2.0)) + (3 * t)) * p2 + // p2
+				((-3 * pow(t, 3.0)) + (3 * pow(t, 2.0))) * p3 + // p3
+				pow(t, 3.0) * p4; // p4
 	}
 	void Draw(vec3 color, float width) {
 		// break the curve into res number of straight pieces, render each with Line()
@@ -123,7 +121,6 @@ void MouseButton(GLFWwindow *w, int butn, int action, int mods) {
 		if (pp) {
 			if (glfwGetMouseButton(w, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 				ptMover.Down(pp, x, y, camera.modelview, camera.persp);
-			std::cout << "Hello" << std::endl;
 		}
 		else
 			camera.MouseDown(x, y);
