@@ -158,12 +158,12 @@ void Display() {
 			Disk(ctrlPts[i][j], 10.0, vec3(0, 0, 0.4), 0.5);
 			if (j != 3)
 				Line(ctrlPts[i][j], ctrlPts[i][j + 1], 1.0f, 1.0f, 2.5f, 0.2);
-			if (j != 0)
-				Line(ctrlPts[i][j], ctrlPts[i][j - 1], 1.0f, 1.0f, 2.5f, 0.2);
+			//if (j != 0)
+			//	Line(ctrlPts[i][j], ctrlPts[i][j - 1], 1.0f, 1.0f, 2.5f, 0.2);
 			if (i != 3)
 				Line(ctrlPts[i][j], ctrlPts[i + 1][j], 1.0f, 1.0f, 2.5f, 0.2);
-			if (i != 0)
-				Line(ctrlPts[i][j], ctrlPts[i - 1][j], 1.0f, 1.0f, 2.5f, 0.2);
+			//if (i != 0)
+			//	Line(ctrlPts[i][j], ctrlPts[i - 1][j], 1.0f, 1.0f, 2.5f, 0.2);
 		}
 	}
     glFlush();
