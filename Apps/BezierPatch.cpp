@@ -34,9 +34,11 @@ bool shift;
 // Bezier operations
 
 vec3 BezTangent(float t, vec3 b1, vec3 b2, vec3 b3, vec3 b4) {
-    // TODO
 	// return the tangent of the curve given parameter t
-	// HERE
+	return	((-3 * pow(t, 2.0)) + (6 * t) - 3) * b1 + // b1
+		((9 * pow(t, 2.0)) - (12 * t) + 3) * b2 + // b2
+		((-9 * pow(t, 2.0)) + (6 * t)) * b3 + // b3
+		(3 * pow(t, 2.0)) * b4; // b4
 }
 
 vec3 BezPoint(float t, vec3 b1, vec3 b2, vec3 b3, vec3 b4) {
@@ -48,9 +50,15 @@ vec3 BezPoint(float t, vec3 b1, vec3 b2, vec3 b3, vec3 b4) {
 }
 
 void BezierPatch(float s, float t, vec3 *point, vec3 *normal) {
-	// TODO
 	// return position and normal at patch (s, t)
-	// HERE
+	vec3 spt[4];
+	for (int i = 0; i < 4; i++) {
+		//int j = 4 * i; // WHY?!
+		int j = i;
+		spt[i] = BezPoint(s, ctrlPts[j][0], ctrlPts[j][1], ctrlPts[j][2], ctrlPts[j][3]);
+	}
+	*point = BezPoint(t, spt[0], spt[1], spt[2], spt[3]);
+	*normal = BezTangent(t, spt[0], spt[1], spt[2], spt[3]);
 };
 
 const char *vShader = "\
@@ -97,9 +105,18 @@ void SetVertices(int res, bool init = false) {
 	int sizeBuffer = 2*4*nQuadrilaterals*sizeof(vec3);
 	if (init)
 		glBufferData(GL_ARRAY_BUFFER, sizeBuffer, NULL, GL_STATIC_DRAW);
-	// TODO
-	// set the 4 vertices for each quadrilateral and save to GPU
-	// HERE
+	vec3 *vPtr = (vec3 *) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	for (int i = 0; i < res; i++) {
+		float s0 = (float)i / res, s1 = (float)(i + 1) / res;
+		for (int j = 0; j < res; j++) {
+			float t0 = (float)j / res, t1 = (float)(j + 1) / res;
+			BezierPatch(s0, t0, vPtr, vPtr + 1); vPtr += 2;
+			BezierPatch(s1, t0, vPtr, vPtr + 1); vPtr += 2;
+			BezierPatch(s1, t1, vPtr, vPtr + 1); vPtr += 2;
+			BezierPatch(s0, t1, vPtr, vPtr + 1); vPtr += 2;
+		}
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 // display
@@ -136,7 +153,19 @@ void Display() {
 	Disk(lightSource, 12, hover == (void *) &lightSource? vec3(0,1,1) : IsVisible(lightSource, camera.fullview)? vec3(1,0,0) : vec3(0,0,1));
 	// TODO
 	// draw 16 movable points and lines between control mesh
-	// HERE
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			Disk(ctrlPts[i][j], 10.0, vec3(0, 0, 0.4), 0.5);
+			if (j != 3)
+				Line(ctrlPts[i][j], ctrlPts[i][j + 1], 1.0f, 1.0f, 2.5f, 0.2);
+			if (j != 0)
+				Line(ctrlPts[i][j], ctrlPts[i][j - 1], 1.0f, 1.0f, 2.5f, 0.2);
+			if (i != 3)
+				Line(ctrlPts[i][j], ctrlPts[i + 1][j], 1.0f, 1.0f, 2.5f, 0.2);
+			if (i != 0)
+				Line(ctrlPts[i][j], ctrlPts[i - 1][j], 1.0f, 1.0f, 2.5f, 0.2);
+		}
+	}
     glFlush();
 }
 
