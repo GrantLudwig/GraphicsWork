@@ -55,7 +55,7 @@ void BezierPatch(float s, float t, vec3 *point, vec3 *normal) {
 	vec3 tpt[4];
 	for (int i = 0; i < 4; i++) {
 		spt[i] = BezPoint(s, ctrlPts[i][0], ctrlPts[i][1], ctrlPts[i][2], ctrlPts[i][3]);
-		tpt[i] = BezPoint(t, ctrlPts[i][0], ctrlPts[i][1], ctrlPts[i][2], ctrlPts[i][3]);
+		tpt[i] = BezPoint(t, ctrlPts[0][i], ctrlPts[1][i], ctrlPts[2][i], ctrlPts[3][i]);
 	}
 	*point = BezPoint(t, spt[0], spt[1], spt[2], spt[3]);
 	vec3 tTan = BezTangent(t, spt[0], spt[1], spt[2], spt[3]);
