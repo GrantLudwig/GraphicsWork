@@ -52,13 +52,15 @@ vec3 BezPoint(float t, vec3 b1, vec3 b2, vec3 b3, vec3 b4) {
 void BezierPatch(float s, float t, vec3 *point, vec3 *normal) {
 	// return position and normal at patch (s, t)
 	vec3 spt[4];
+	vec3 tpt[4];
 	for (int i = 0; i < 4; i++) {
-		//int j = 4 * i; // WHY?!
-		int j = i;
-		spt[i] = BezPoint(s, ctrlPts[j][0], ctrlPts[j][1], ctrlPts[j][2], ctrlPts[j][3]);
+		spt[i] = BezPoint(s, ctrlPts[i][0], ctrlPts[i][1], ctrlPts[i][2], ctrlPts[i][3]);
+		tpt[i] = BezPoint(t, ctrlPts[i][0], ctrlPts[i][1], ctrlPts[i][2], ctrlPts[i][3]);
 	}
 	*point = BezPoint(t, spt[0], spt[1], spt[2], spt[3]);
-	*normal = BezTangent(t, spt[0], spt[1], spt[2], spt[3]);
+	vec3 tTan = BezTangent(t, spt[0], spt[1], spt[2], spt[3]);
+	vec3 sTan = BezTangent(s, tpt[0], tpt[1], tpt[2], tpt[3]);
+	*normal = normalize(cross(tTan, sTan));
 };
 
 const char *vShader = "\
@@ -151,19 +153,14 @@ void Display() {
 	UseDrawShader(camera.fullview);
 	glDisable(GL_DEPTH_TEST);
 	Disk(lightSource, 12, hover == (void *) &lightSource? vec3(0,1,1) : IsVisible(lightSource, camera.fullview)? vec3(1,0,0) : vec3(0,0,1));
-	// TODO
 	// draw 16 movable points and lines between control mesh
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			Disk(ctrlPts[i][j], 10.0, vec3(0, 0, 0.4), 0.5);
 			if (j != 3)
 				Line(ctrlPts[i][j], ctrlPts[i][j + 1], 1.0f, 1.0f, 2.5f, 0.2);
-			//if (j != 0)
-			//	Line(ctrlPts[i][j], ctrlPts[i][j - 1], 1.0f, 1.0f, 2.5f, 0.2);
 			if (i != 3)
 				Line(ctrlPts[i][j], ctrlPts[i + 1][j], 1.0f, 1.0f, 2.5f, 0.2);
-			//if (i != 0)
-			//	Line(ctrlPts[i][j], ctrlPts[i - 1][j], 1.0f, 1.0f, 2.5f, 0.2);
 		}
 	}
     glFlush();
